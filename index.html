@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>LLEGA — Repartidor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--coral:#E8402A;--coral-d:#C93320;--coral-s:#FDECE8;--ink:#1C1917;--mut:#6E6A66;--bg:#FAF7F3;--card:#fff;--line:#EAE3DC;--line2:#D9CFC6;--ok:#1F7A4D;--ok-bg:#E6F3EC;--warn-bg:#FFF3D6;--warn:#9A6A00}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:15px;line-height:1.45}
+h1,h2,h3,.num,.money{font-family:Sora,system-ui,sans-serif;letter-spacing:-.03em}
+button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:15px}
+.app{max-width:480px;margin:0 auto;min-height:100vh;padding-bottom:96px;position:relative}
+.top{position:sticky;top:0;z-index:20;background:var(--bg);padding:16px 16px 10px;display:flex;align-items:center;justify-content:space-between}
+.logo{display:flex;align-items:center;gap:10px}
+.mark{width:40px;height:40px;border-radius:12px;background:var(--coral);color:#fff;display:grid;place-items:center;font-family:Sora;font-weight:800;font-size:20px}
+.logo b{font-family:Sora;font-size:22px;letter-spacing:-.04em}
+.logo small{display:block;font-size:11px;color:var(--mut);letter-spacing:.06em;text-transform:uppercase}
+.iconbtn{width:42px;height:42px;border:1px solid var(--line);background:#fff;border-radius:12px;display:grid;place-items:center;position:relative}
+.badge{position:absolute;top:-6px;right:-6px;background:var(--coral);color:#fff;font-size:11px;min-width:20px;height:20px;border-radius:10px;display:grid;place-items:center;padding:0 5px;font-weight:700}
+.view{display:none;padding:4px 16px 16px}
+.view.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(28,25,23,.05),0 8px 24px rgba(28,25,23,.06)}
+.label{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.big{font-size:28px;line-height:32px;font-weight:800}
+.money{font-size:34px;line-height:36px;font-weight:800}
+.mut{color:var(--mut)} .small{font-size:13px} .strong{font-weight:700}
+.row{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.grow{flex:1}
+.btn{display:block;width:100%;height:52px;border-radius:14px;background:var(--coral);color:#fff;font-family:Sora;font-weight:600;font-size:16px}
+.btn:hover{background:var(--coral-d)} .btn:disabled{opacity:.45;cursor:not-allowed}
+.btn2{display:block;width:100%;height:52px;border-radius:14px;background:#fff;border:1.5px solid var(--line2);font-weight:600;font-size:15px}
+.btn-sm{height:42px;font-size:14px}
+.link{color:#B42318;font-weight:600;font-size:14px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#F0EBE6;color:var(--mut)}
+.pill.on{background:var(--ok-bg);color:var(--ok)} .pill.busy{background:var(--coral-s);color:var(--coral-d)}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.switch{width:64px;height:36px;border-radius:999px;background:#D9CFC6;position:relative;flex:none;transition:.2s}
+.switch:after{content:"";position:absolute;top:3px;left:3px;width:30px;height:30px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:.2s}
+.switch.on{background:var(--ok)} .switch.on:after{left:31px}
+.map{height:300px;border-radius:20px;border:1px solid var(--line);overflow:hidden;position:relative;background:#EFE9E3}
+.map.big{height:420px}
+.street{position:absolute;background:#fff;border:1px solid #DDD5CC}
+.street-l{position:absolute;font-size:11px;color:#8A8580;font-weight:600;letter-spacing:.02em}
+.pin{position:absolute;transform:translate(-50%,-100%);text-align:center;z-index:3}
+.pin i{width:34px;height:34px;border-radius:50% 50% 50% 4px;transform:rotate(-45deg);display:grid;place-items:center;color:#fff;font-style:normal;border:2px solid #fff;box-shadow:0 4px 10px rgba(0,0,0,.25)}
+.pin i svg{transform:rotate(45deg)}
+.pin span{display:block;background:#fff;border:1px solid var(--line);border-radius:8px;padding:2px 6px;font-size:11px;font-weight:700;margin-top:4px;white-space:nowrap}
+.driver{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--coral);border:3px solid #fff;box-shadow:0 0 0 4px rgba(232,64,42,.25),0 4px 10px rgba(0,0,0,.3);transform:translate(-50%,-50%);z-index:4;transition:left .3s linear,top .3s linear}
+.route{position:absolute;height:4px;background:var(--coral);border-radius:4px;transform-origin:left center;z-index:2;opacity:.85}
+.chips{display:flex;gap:8px;margin:4px 0 12px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:none;padding:9px 14px;border-radius:999px;border:1.5px solid var(--line2);background:#fff;font-weight:600;font-size:13px}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.offer h3{font-size:18px;line-height:24px}
+.timer{font-family:Sora;font-weight:800;color:var(--coral-d);font-size:18px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.meta span{background:#FAF7F3;border:1px solid var(--line);border-radius:8px;padding:5px 8px;font-size:12px;font-weight:600}
+.price{font-family:Sora;font-size:22px;font-weight:800}
+.dark{background:var(--ink);color:#fff;border-radius:24px;padding:20px;margin-bottom:12px}
+.dark .money{color:#FF6B52}
+.dark .mut{color:#CFC8C2}
+.bar{height:10px;background:#F0EBE6;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--coral);border-radius:99px}
+.chart{display:flex;align-items:flex-end;gap:8px;height:110px;padding-top:10px}
+.chart div{flex:1;text-align:center}.chart i{display:block;background:var(--coral);border-radius:6px 6px 0 0;margin:0 auto;width:70%}
+.chart b{font-size:11px;color:var(--mut);display:block;margin-top:6px}
+.steps{display:flex;gap:6px;margin:12px 0}.steps i{flex:1;height:6px;border-radius:99px;background:#EAE3DC}.steps i.done{background:var(--ok)}.steps i.now{background:var(--coral)}
+.check{display:flex;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.check input{width:22px;height:22px;accent-color:var(--coral)}
+.chatmsg{max-width:85%;padding:10px 12px;border-radius:14px;margin-bottom:8px;font-size:14px}
+.chatmsg.me{margin-left:auto;background:var(--coral);color:#fff;border-bottom-right-radius:4px}
+.chatmsg.them{background:#F0EBE6;border-bottom-left-radius:4px}
+.qchip{border:1px solid var(--line2);border-radius:999px;padding:8px 11px;font-size:13px;background:#fff;margin:0 6px 6px 0}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-top:1px solid var(--line);display:flex;padding:8px 6px calc(10px + env(safe-area-inset-bottom));z-index:30}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:#8A8580}
+.nav button.on{color:var(--coral)} .nav svg{width:22px;height:22px}
+.field{margin-bottom:12px}.field label{display:block;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--mut);margin-bottom:6px}
+.field input,.field select{width:100%;height:48px;border:1.5px solid var(--line2);border-radius:12px;padding:0 12px;background:#fff}
+.toastwrap{position:fixed;top:12px;left:50%;transform:translateX(-50%);width:min(440px,calc(100% - 24px));z-index:99}
+.toast{background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.25);font-size:14px}
+.toast b{color:#FF6B52}
+.notice{border-left:4px solid var(--coral);background:#fff;border-radius:12px;padding:12px;margin-bottom:8px;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:8px;margin-bottom:12px}.tabs button{flex:1;height:40px;border-radius:10px;border:1px solid var(--line2);background:#fff;font-weight:600}.tabs button.on{background:var(--ink);color:#fff}
+.avatar{width:64px;height:64px;border-radius:50%;background:var(--coral-s);color:var(--coral-d);display:grid;place-items:center;font-family:Sora;font-weight:800;font-size:24px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="logo"><div class="mark">L</div><div><b>LLEGA</b><small>Repartidor · Houston</small></div></div>
+  <button class="iconbtn" onclick="showView('notifs')" aria-label="Notificaciones"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="badge" id="notifCount">3</span></button>
+</header>
+<div class="toastwrap" id="toasts"></div>
+
+<!-- INICIO -->
+<section class="view on" id="view-home">
+  <div class="card">
+    <div class="row between"><div><div class="label">Hola, <span id="helloName">Darel</span></div><h1 class="big" id="onlineTitle">Fuera de línea</h1><p class="mut small">Actívate y empiezan a llegarte pedidos cerca de ti.</p></div><button class="switch" id="onlineSwitch" onclick="toggleOnline()" aria-label="En línea"></button></div>
+    <div style="margin-top:12px"><span class="pill" id="onlinePill"><span class="dot"></span> Fuera de línea</span> <span class="pill busy" id="hotPill">Zona caliente: Midtown · +$3 por entrega</span></div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="map" id="homeMap"></div>
+    <div style="padding:14px 16px" class="row between"><div><div class="label">En tu zona ahora</div><b>4 pedidos a menos de 3 mi</b><div class="mut small">Westheimer Rd · Montrose</div></div><button class="btn2 btn-sm" style="width:auto;padding:0 16px" onclick="showView('offers')">Ver ofertas</button></div>
+  </div>
+  <div class="dark"><div class="label" style="color:#CFC8C2">Ganancias de hoy</div><div class="money" id="todayMoney">$0.00</div><div class="mut small"><span id="todayCount">0 entregas</span> · <span id="todayAvg">$0.00 por entrega</span></div><button class="btn" style="margin-top:14px" onclick="showView('earnings')">Ver ganancias</button></div>
+  <div class="card"><div class="row between"><div><b>Tu turno de hoy</b><div class="mut small">5:00 PM – 9:00 PM · Montrose</div></div><button class="link" onclick="showView('shifts')">Turnos</button></div></div>
+  <div class="card" id="activeCardHome"></div>
+</section>
+
+<!-- OFERTAS -->
+<section class="view" id="view-offers">
+  <h1 class="big" style="margin:6px 0 4px">Ofertas cerca de ti</h1>
+  <p class="mut">Tienes 30 segundos para decidir cada una. Sin penalización por rechazar 1 o 2.</p>
+  <div class="chips"><button class="chip on" data-f="todos" onclick="setFilter(this,'todos')">Todos</button><button class="chip" data-f="cerca" onclick="setFilter(this,'cerca')">Cerca · menos de 2 mi</button><button class="chip" data-f="mejor" onclick="setFilter(this,'mejor')">Mejor pago</button></div>
+  <div id="offersList"></div>
+</section>
+
+<!-- MAPA -->
+<section class="view" id="view-map">
+  <h1 class="big" style="margin:6px 0 4px">Mapa</h1>
+  <p class="mut" id="mapSub">Tu ruta en vivo, sin salir de LLEGA.</p>
+  <div class="map big" id="bigMap" style="margin-top:12px"></div>
+  <div class="card" style="margin-top:12px" id="activeCardMap"></div>
+  <div class="row"><button class="btn2 grow" onclick="centerMap()">Centrar</button><button class="btn2 grow" onclick="notify('Navegación por voz activada. Gira a la derecha en Westheimer Rd.','info')">Navegar</button></div>
+</section>
+
+<!-- GANANCIAS -->
+<section class="view" id="view-earnings">
+  <h1 class="big" style="margin:6px 0 12px">Ganancias</h1>
+  <div class="dark"><div class="label" style="color:#CFC8C2">Esta semana</div><div class="money" id="weekMoney">$0.00</div><div class="mut small" id="weekMeta"></div>
+  <div class="row" style="margin-top:12px"><button class="btn grow" onclick="withdraw()">Retirar ahora</button></div>
+  <div class="mut small" style="margin-top:8px">Pago semanal los martes · Retiro instantáneo $0.50</div></div>
+  <div class="card"><div class="label">Desglose de hoy</div><div class="row between" style="margin-top:8px"><span>Base</span><b id="dBase">$0.00</b></div><div class="row between"><span>Propinas</span><b id="dTip">$0.00</b></div><div class="row between"><span>Bonos y retos</span><b id="dBonus">$0.00</b></div><hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><div class="row between"><span class="strong">Total hoy</span><b class="price" id="dTotal">$0.00</b></div></div>
+  <div class="card"><div class="label">Últimos 7 días</div><div class="chart" id="chart"></div></div>
+  <div class="card"><div class="label">Retos de hoy</div><div id="challenges"></div></div>
+  <div class="card"><div class="row between"><div><div class="label">Tu nivel</div><h3 id="levelName">Plata</h3><div class="mut small" id="levelDesc">+$1.00 por entrega · Prioridad en ofertas</div></div><b class="num" id="xpText">0 XP</b></div><div class="bar" style="margin-top:10px"><i id="xpBar" style="width:10%"></i></div><div class="mut small" id="xpNext" style="margin-top:6px"></div></div>
+  <div class="card"><div class="row between"><div><b>Últimas entregas pagadas</b><div class="mut small">El dinero cae 30 min después de entregar.</div></div><button class="link" onclick="showView('history')">Historial</button></div><div id="paidList" style="margin-top:10px"></div></div>
+</section>
+
+<!-- PERFIL -->
+<section class="view" id="view-profile">
+  <h1 class="big" style="margin:6px 0 12px">Perfil</h1>
+  <div class="card"><div class="row"><div class="avatar" id="avatarInit">DV</div><div class="grow"><h3 id="profileName">Darel Vega</h3><div class="mut small">Repartidor desde nov 2026 · Houston</div><div style="margin-top:6px"><span class="pill on">4.9 de 5</span> <span class="pill">1,247 entregas</span></div></div><button class="link" onclick="editProfile()">Editar</button></div>
+  <div class="row" style="margin-top:14px;text-align:center"><div class="grow"><b class="num">98%</b><div class="mut small">Aceptación</div></div><div class="grow"><b class="num">96%</b><div class="mut small">Puntualidad</div></div><div class="grow"><b class="num">1%</b><div class="mut small">Cancelación</div></div></div></div>
+  <div class="card" id="profileForm" style="display:none"></div>
+  <div class="card"><b>Tu vehículo</b><div class="mut" style="margin-top:4px" id="vehicleText">Honda Civic 2019 · gris · Placa TX-4821-K</div><div class="mut small" style="margin-top:4px">Zona base: <span id="zoneText">Montrose</span> · Tel: <span id="phoneText">+1 (713) 555-0148</span></div></div>
+  <div class="card"><b>Reseñas recientes</b><div style="margin-top:10px" class="small"><p><b>Sofia R. · 5 de 5</b><br><span class="mut">“Rapidísimo y la comida llegó caliente.”</span></p><p style="margin-top:10px"><b>James L. · 5 de 5</b><br><span class="mut">“Muy amable, me escribió cuando llegó.”</span></p><p style="margin-top:10px"><b>María G. · 4 de 5</b><br><span class="mut">“Tardó un poco por el tráfico, pero avisó.”</span></p></div></div>
+  <div class="row"><button class="btn2 grow" onclick="showView('shifts')">Mis turnos</button><button class="btn2 grow" onclick="showView('history')">Historial</button></div>
+  <button class="btn2" style="margin-top:12px" onclick="notify('Soporte LLEGA: te respondemos en menos de 2 minutos.','info')">Ayuda y soporte 24/7</button>
+</section>
+
+<!-- TURNOS -->
+<section class="view" id="view-shifts">
+  <button class="link" onclick="showView('home')">← Volver</button>
+  <h1 class="big" style="margin:8px 0 12px">Mis turnos</h1>
+  <div class="card"><div class="field"><label>Día</label><select id="shDay"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option><option>Domingo</option></select></div>
+  <div class="row"><div class="field grow"><label>Inicio</label><input id="shStart" type="time" value="17:00"></div><div class="field grow"><label>Fin</label><input id="shEnd" type="time" value="21:00"></div></div>
+  <div class="field"><label>Zona</label><select id="shZone"><option>Montrose</option><option>Midtown</option><option>Heights</option><option>Galleria</option><option>Downtown</option></select></div>
+  <button class="btn" onclick="saveShift()">Guardar turno</button></div>
+  <div id="shiftList"></div>
+</section>
+
+<!-- HISTORIAL -->
+<section class="view" id="view-history">
+  <button class="link" onclick="showView('home')">← Volver</button>
+  <h1 class="big" style="margin:8px 0 12px">Historial</h1>
+  <div class="tabs"><button class="on" onclick="setHist(this,'todas')">Todas</button><button onclick="setHist(this,'entregado')">Entregadas</button><button onclick="setHist(this,'cancelado')">Canceladas</button><button onclick="setHist(this,'rechazado')">Rechazadas</button></div>
+  <div id="historyList"></div>
+</section>
+
+<!-- NOTIFICACIONES -->
+<section class="view" id="view-notifs">
+  <button class="link" onclick="showView('home')">← Volver</button>
+  <h1 class="big" style="margin:8px 0 12px">Notificaciones</h1>
+  <div id="notifList"></div>
+</section>
+
+<!-- PEDIDO ACTIVO (modal simple dentro de Ofertas/Mapa) -->
+<section class="view" id="view-active">
+  <button class="link" onclick="showView('offers')">← Volver a ofertas</button>
+  <div id="activeDetail"></div>
+</section>
+</div>
+
+<nav class="nav">
+  <button class="on" data-v="home" onclick="showView('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Inicio</button>
+  <button data-v="offers" onclick="showView('offers')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Ofertas</button>
+  <button data-v="map" onclick="showView('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg>Mapa</button>
+  <button data-v="earnings" onclick="showView('earnings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg>Ganancias</button>
+  <button data-v="profile" onclick="showView('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-5.5 8-5.5s6.5 1.5 8 5.5"/></svg>Perfil</button>
+</nav>
+<script>
+const ORDERS0=[
+{id:"LLE-1042",r:"Torchy's Tacos",pick:"2801 S Shepherd Dr, Houston, TX 77098",c:"María González",drop:"1415 Westheimer Rd, Apt 4B, Houston, TX 77006",mi:3.2,base:4.50,tip:6.00,total:12.50,eta:22,items:["2x Taco Baja Shrimp","1x Chips & Queso","1x Limonada"],notes:"Toca dos veces, deja en la puerta. No toques el timbre, el bebé duerme.",pin:"7394",code:"4821",px:22,py:35,dx:48,dy:41},
+{id:"LLE-1044",r:"Uchi Houston",pick:"904 Westheimer Rd, Houston, TX 77006",c:"Sofia Ramírez",drop:"2200 Montrose Blvd, Apt 12, Houston, TX 77006",mi:2.6,base:5.00,tip:11.25,total:18.25,eta:26,items:["Sushi Hama Chili x1","Sake x1","Edamame x1"],notes:"Déjalo con el portero. Pedido frágil, mantener plano.",pin:"5810",code:"4821",px:45,py:55,dx:58,dy:70},
+{id:"LLE-1041",r:"The Breakfast Klub",pick:"3711 Travis St, Houston, TX 77002",c:"Ana Pérez",drop:"1801 Main St, Houston, TX 77002",mi:1.9,base:3.80,tip:5.00,total:9.80,eta:16,items:["Pancakes de arándanos x1","Café grande x1","Huevos rancheros x1"],notes:"Entrega en mano, sin PIN. Dejar en la puerta si no contesta.",pin:"",code:"4821",px:32,py:58,dx:48,dy:41},
+{id:"LLE-1043",r:"Velvet Taco",pick:"5115 Buffalo Speedway, Houston",c:"James L.",drop:"2727 Kirby Dr, River Oaks, Houston",mi:1.8,base:6.25,tip:5.50,total:11.75,eta:15,items:["Taco de pollo tikka x2","Elote x1"],notes:"Entregar en mano en la entrada principal.",pin:"2045",code:"4821",px:30,py:70,dx:36,dy:62},
+{id:"LLE-1045",r:"Pappasito's Cantina",pick:"2200 S Main St, Houston",c:"Carlos M.",drop:"1900 Richmond Ave, Houston, TX 77098",mi:2.9,base:6.90,tip:8.00,total:14.90,eta:24,items:["Fajitas para 2 x1","Queso flameado x1","Té dulce x2"],notes:"Llamar al llegar, el portón está cerrado.",pin:"8812",code:"4821",px:68,py:22,dx:74,dy:38},
+{id:"LLE-1046",r:"Shake Shack Galleria",pick:"5000 Westheimer Rd, Houston, TX 77056",c:"David T.",drop:"5700 Westheimer Rd, Galleria, Houston",mi:2.1,base:5.20,tip:5.00,total:10.20,eta:19,items:["ShackBurger x2","Papas con queso x1","Malteada x1"],notes:"Oficina, recepción planta baja.",pin:"3390",code:"4821",px:15,py:18,dx:28,dy:26},
+{id:"LLE-1047",r:"Chipotle Montrose",pick:"1200 Westheimer Rd, Houston, TX 77006",c:"Luis H.",drop:"1300 W Alabama St, Houston, TX 77006",mi:1.2,base:4.00,tip:5.00,total:9.00,eta:15,items:["Burrito bowl x2","Guacamole x1"],notes:"Dejar en la puerta.",pin:"",code:"4821",px:52,py:44,dx:60,dy:52},
+{id:"LLE-1048",r:"Pinkerton's Barbecue",pick:"1504 Airline Dr, Houston, TX 77007",c:"Sofía Delgado",drop:"923 W 19th St, Houston Heights",mi:3.1,base:4.75,tip:3.25,total:8.00,eta:22,items:["Brisket x1 lb","Costillas x1/2 lb","Mac & cheese x1"],notes:"Apartamento 4B, subir por escaleras.",pin:"1123",code:"4821",px:80,py:60,dx:88,dy:74}
+];
+const LEVELS=[{n:"Novato",min:0,b:"Sin bono"},{n:"Bronce",min:500,b:"+$0.50 por entrega"},{n:"Plata",min:1000,b:"+$1.00 por entrega · Prioridad en ofertas"},{n:"Oro",min:2500,b:"+$1.50 por entrega · Soporte prioritario"},{n:"Diamante",min:5000,b:"+$2.00 por entrega · Mejores ofertas primero"}];
+const WEEK=[{d:"Lun",v:72.10},{d:"Mar",v:86.40},{d:"Mié",v:94.25},{d:"Jue",v:110.50},{d:"Vie",v:148.90},{d:"Sáb",v:162.30},{d:"Dom",v:98.15}];
+let S;
+function load(){try{S=JSON.parse(localStorage.getItem("llega_v1"))||null}catch(e){S=null}
+ if(!S){S={online:false,orders:ORDERS0.map(o=>({...o,status:"disponible",timer:30,checked:[]})),activeId:null,step:0,driver:{x:40,y:50},earned:0,base:0,tip:0,bonus:0,deliveries:0,xp:1240,shifts:[{day:"Hoy",start:"17:00",end:"21:00",zone:"Montrose"}],history:[],notifs:[{t:"Hora pico 6–9 PM: +$2 por entrega en Galleria",h:"6:00 PM"},{t:"Nueva oferta cerca: Torchy's Tacos · $12.50",h:"5:42 PM"},{t:"Reto: 5 entregas antes de las 9 PM · +$12",h:"5:00 PM"}],challenges:[{id:"c1",t:"5 entregas antes de las 9 PM",meta:5,reward:12,done:false},{id:"c2",t:"Gana $60 hoy",meta:60,reward:8,done:false},{id:"c3",t:"3 entregas seguidas sin cancelar",meta:3,reward:5,done:false}],profile:{name:"Darel Vega",vehicle:"Honda Civic 2019",color:"gris",plate:"TX-4821-K",zone:"Montrose",phone:"+1 (713) 555-0148"},chat:[],histFilter:"todas",filter:"todos"};save();}}
+function save(){localStorage.setItem("llega_v1",JSON.stringify(S))}
+const $=id=>document.getElementById(id);
+const money=n=>"$"+n.toFixed(2);
+function active(){return S.orders.find(o=>o.id===S.activeId)}
+function notify(msg,type){const t=document.createElement("div");t.className="toast";t.innerHTML="<b>LLEGA</b><span>"+msg+"</span>";$("toasts").appendChild(t);setTimeout(()=>t.remove(),4500);S.notifs.unshift({t:msg,h:new Date().toLocaleTimeString([],{hour:"numeric",minute:"2-digit"})});$("notifCount").textContent=S.notifs.length;save();renderNotifs();}
+function showView(v){document.querySelectorAll(".view").forEach(e=>e.classList.remove("on"));const el=$("view-"+v);if(el)el.classList.add("on");document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));window.scrollTo(0,0);if(v==="map")renderMaps();if(v==="earnings")renderEarnings();if(v==="offers")renderOffers();if(v==="history")renderHistory();if(v==="shifts")renderShifts();}
+function toggleOnline(){S.online=!S.online;save();renderHome();notify(S.online?"Estás en línea. Te empezarán a llegar pedidos cerca de ti.":"Te pusiste fuera de línea. Tus ganancias quedan guardadas.","info");if(S.online)renderOffers();}
+function setFilter(btn,f){S.filter=f;document.querySelectorAll(".chip").forEach(c=>c.classList.toggle("on",c===btn));renderOffers();}
+function setHist(btn,f){S.histFilter=f;document.querySelectorAll("#view-history .tabs button").forEach(c=>c.classList.toggle("on",c===btn));renderHistory();}
+function offersFiltered(){let l=S.orders.filter(o=>o.status==="disponible");if(S.filter==="cerca")l=l.filter(o=>o.mi<2);if(S.filter==="mejor")l=[...l].sort((a,b)=>b.total-a.total);return l;}
+function renderOffers(){const l=offersFiltered();$("offersList").innerHTML=l.length?l.map(o=>`<div class="card offer"><div class="row between"><span class="label">${o.id} · ${o.eta} min</span><span class="timer" data-timer="${o.id}">0:${String(o.timer).padStart(2,"0")}</span></div><h3 style="margin-top:6px">${o.r}</h3><div class="mut small">${o.pick}</div><div style="margin-top:10px"><b>${o.c}</b><div>${o.drop}</div><div class="mut small" style="margin-top:4px">${o.notes}</div></div><div class="meta"><span>${o.mi} mi</span><span>Base ${money(o.base)}</span><span>Propina ${money(o.tip)}</span></div><div class="row between"><span class="price">${money(o.total)}</span><span class="mut small">total para ti</span></div><div class="row" style="margin-top:12px"><button class="btn grow" onclick="acceptOrder('${o.id}')">Aceptar</button><button class="btn2" style="width:110px" onclick="rejectOrder('${o.id}')">Rechazar</button></div></div>`).join(""):`<div class="card"><b>No hay ofertas ahora mismo.</b><p class="mut">Quédate en línea, en Midtown hay +$3 por entrega hasta las 8 PM.</p></div>`;
+ if(active())$("offersList").insertAdjacentHTML("afterbegin",`<div class="card" style="border-color:var(--coral)"><b>Tienes un pedido activo: ${active().r} → ${active().c}</b><div class="mut small">Termínalo antes de aceptar otro.</div><button class="btn" style="margin-top:10px" onclick="openActive()">Ver pedido activo</button></div>`);}
+function acceptOrder(id){if(S.activeId){notify("Ya tienes un pedido activo. Termínalo primero.","info");return;}if(!S.online){notify("Primero ponte en línea en Inicio.","info");showView("home");return;}const o=S.orders.find(x=>x.id===id);o.status="aceptado";S.activeId=id;S.step=0;S.driver={x:40,y:50};S.chat=[];save();notify("Pedido "+id+" aceptado — "+o.r,"success");openActive();}
+function rejectOrder(id){const o=S.orders.find(x=>x.id===id);o.status="rechazado";S.history.unshift({id:o.id,r:o.r,c:o.c,total:o.total,status:"rechazado",when:"Hoy"});save();notify("Oferta rechazada. Buscando otra cerca de ti…","info");renderOffers();renderHistory();}
+function openActive(){renderActive();showView("active");}
+function renderActive(){const o=active();if(!o){$("activeDetail").innerHTML=`<div class="card"><b>No tienes pedido activo.</b><p class="mut">Acepta una oferta para empezar.</p></div>`;return;}
+ const steps=["En camino al restaurante","Recogida","En camino al cliente","Entrega"];
+ let body="";
+ if(S.step===0){body=`<p class="mut">Ruta: tú → ${o.r} · ${o.mi} mi · ${o.eta} min</p><div class="map" id="activeMap" style="height:220px;margin:12px 0"></div><button class="btn" onclick="nextStep()">Llegué al restaurante</button><button class="btn2" style="margin-top:10px" onclick="cancelActive()">Cancelar pedido</button>`;}
+ if(S.step===1){body=`<div class="label">Código de recogida</div><div class="big" style="font-size:40px">${o.code}</div><p class="mut">Dile este código al empleado del restaurante.</p><div style="margin-top:10px">${o.items.map((it,i)=>`<label class="check"><input type="checkbox" ${o.checked.includes(i)?"checked":""} onchange="toggleItem(${i})"><span>${it}</span></label>`).join("")}</div><label class="check"><input type="checkbox" onchange="this.checked?notify('Bolsa sellada confirmada.','info'):''"><span>Bolsa sellada</span></label><button class="btn" style="margin-top:12px" onclick="nextStep()">Pedido recogido</button><button class="link" style="margin-top:10px" onclick="notify('Avisamos al cliente: el pedido se está demorando. +$1.50 por espera.','info')">El pedido se está demorando</button>`;}
+ if(S.step===2){body=`<p class="mut">Ruta: ${o.r} → ${o.c} · ${o.mi} mi</p><div class="map" id="activeMap" style="height:220px;margin:12px 0"></div><div class="row"><button class="btn2 grow" onclick="quickChat('Estoy en camino')">Llamar</button><button class="btn2 grow" onclick="quickChat('Estoy afuera, ¿puedes salir?')">Mensaje</button><button class="btn2 grow" onclick="notify('Navegación por voz activada.','info')">Navegar</button></div><div style="margin-top:12px">${S.chat.map(m=>`<div class="chatmsg ${m.me?"me":"them"}">${m.t}</div>`).join("")}</div><div>${["Estoy en camino","Llegué al restaurante, están preparando tu pedido","Estoy afuera, ¿puedes salir?","Lo dejé en la puerta, ¡buen provecho!"].map(q=>`<button class="qchip" onclick="quickChat('${q}')">${q}</button>`).join("")}</div><button class="btn" style="margin-top:12px" onclick="nextStep()">Llegué a la dirección</button>`;}
+ if(S.step===3){body=o.pin?`<div class="label">Pide el PIN al cliente</div><div class="big" style="font-size:40px">••••</div><p class="mut">El PIN de ${o.c} es ${o.pin} (en esta demo se muestra para probar el flujo).</p><div class="field"><label>PIN del cliente</label><input id="pinInput" inputmode="numeric" placeholder="Escribe el PIN, ej. ${o.pin}"></div><button class="btn" onclick="confirmDelivery()">Entrega completada</button>`:`<p class="mut">${o.notes}</p><button class="btn" onclick="confirmDelivery()">Entrega completada</button><button class="btn2" style="margin-top:10px" onclick="notify('Foto de entrega guardada y enviada al cliente.','info')">Tomar foto de entrega</button>`;
+  body+=`<button class="btn2" style="margin-top:10px" onclick="notify('Foto de entrega guardada y enviada al cliente.','info')">Foto: dejar en puerta</button>`;}
+ if(S.step===4){body=`<div style="text-align:center;padding:10px 0"><div style="font-size:44px;color:var(--ok)">✓</div><h2 class="big">Entrega completada</h2><p class="mut">Ganaste ${money(o.total)} en ${o.eta} min · ${o.mi} mi</p><div class="row between" style="margin-top:12px;text-align:left"><span>Base</span><b>${money(o.base)}</b></div><div class="row between"><span>Propina</span><b>${money(o.tip)}</b></div><div class="row between"><span class="strong">Total</span><b class="price">${money(o.total)}</b></div><button class="btn" style="margin-top:14px" onclick="finishActive()">Siguiente pedido</button><button class="btn2" style="margin-top:10px" onclick="showView('earnings')">Ver ganancias</button></div>`;}
+ $("activeDetail").innerHTML=`<div class="card"><div class="steps">${steps.map((s,i)=>`<i class="${i<S.step?"done":i===S.step?"now":""}"></i>`).join("")}</div><div class="label">Paso ${Math.min(S.step+1,4)} de 4 · ${steps[Math.min(S.step,3)]}</div><h2 style="margin:8px 0 4px">${o.r} → ${o.c}</h2><div class="mut small">${o.pick} → ${o.drop}</div><div class="meta"><span>${o.mi} mi</span><span>${money(o.total)}</span><span>${o.eta} min</span></div>${body}</div><div class="card"><b>Nota del cliente</b><p class="mut" style="margin-top:4px">${o.notes}</p></div>`;
+ if(S.step===0||S.step===2)renderMapInto("activeMap",o);}
+function toggleItem(i){const o=active();const k=o.checked.indexOf(i);if(k>=0)o.checked.splice(k,1);else o.checked.push(i);save();}
+function nextStep(){S.step++;if(S.step===2)moveDriverToPickup();save();renderActive();renderHome();}
+function moveDriverToPickup(){const o=active();if(o)S.driver={x:o.px,y:o.py};}
+function quickChat(t){S.chat.push({t,me:true});save();renderActive();setTimeout(()=>{S.chat.push({t:"Perfecto, gracias.",me:false});save();if($("view-active").classList.contains("on"))renderActive();},900);}
+function confirmDelivery(){const o=active();if(o.pin){const v=($("pinInput")||{}).value||"";if(v.trim()!==o.pin){notify("Ese PIN no coincide. Pídelo de nuevo al cliente.","info");return;}}
+ o.status="entregado";S.earned+=o.total;S.base+=o.base;S.tip+=o.tip;S.deliveries++;S.xp+=100;S.history.unshift({id:o.id,r:o.r,c:o.c,total:o.total,status:"entregado",when:"Hoy"});S.step=4;checkChallenges();save();notify("Entregado · +"+money(o.total)+" ("+money(o.tip)+" propina)","success");renderActive();renderHome();renderEarnings();}
+function finishActive(){S.activeId=null;S.step=0;save();renderHome();showView("offers");}
+function cancelActive(){const o=active();if(!o)return;o.status="cancelado";S.history.unshift({id:o.id,r:o.r,c:o.c,total:o.total,status:"cancelado",when:"Hoy"});S.activeId=null;S.step=0;S.xp=Math.max(0,S.xp-50);save();notify("Pedido cancelado. −50 XP y se rompe la racha.","info");showView("offers");renderHome();}
+function checkChallenges(){S.challenges.forEach(c=>{if(c.done)return;let p=c.id==="c1"?S.deliveries:c.id==="c2"?S.earned:3;if(p>=c.meta){c.done=true;S.bonus+=c.reward;S.earned+=c.reward;notify("Reto completado: "+c.t+" — +"+money(c.reward),"success");}});}
+function withdraw(){if(S.earned<=0){notify("Aún no tienes ganancias hoy para retirar.","info");return;}notify("Retiro instantáneo de "+money(S.earned)+" enviado a tu cuenta. Comisión $0.50.","success");}
+function renderHome(){$("onlineSwitch").classList.toggle("on",S.online);$("onlineTitle").textContent=S.online?"En línea":"Fuera de línea";$("onlinePill").className="pill "+(S.online?"on":"");$("onlinePill").innerHTML=`<span class="dot"></span> ${S.online?"Disponible":"Fuera de línea"}`;$("helloName").textContent=S.profile.name.split(" ")[0];$("todayMoney").textContent=money(S.earned);$("todayCount").textContent=S.deliveries+" entregas";$("todayAvg").textContent=money(S.deliveries?S.earned/S.deliveries:0)+" por entrega";
+ const o=active();$("activeCardHome").innerHTML=o?`<b>Pedido activo: ${o.r} → ${o.c}</b><div class="mut small">${money(o.total)} · ${o.mi} mi · Paso ${S.step+1} de 4</div><button class="btn" style="margin-top:10px" onclick="openActive()">Continuar entrega</button>`:`<b>¿Listo para ganar hoy?</b><div class="mut small">Ponte en línea y acepta tu primer pedido en Montrose.</div>`;
+ renderMapInto("homeMap",o);}
+function renderMaps(){renderMapInto("bigMap",active());const o=active();$("activeCardMap").innerHTML=o?`<b>${o.r} → ${o.c}</b><div class="mut small">${money(o.total)} · ${o.mi} mi · ETA ${o.eta} min</div><button class="btn" style="margin-top:10px" onclick="openActive()">Ver pedido activo</button>`:`<b>Sin pedido activo</b><p class="mut">Cuando aceptes uno, aquí verás la ruta en vivo.</p><button class="btn2" style="margin-top:10px" onclick="showView('offers')">Ver ofertas</button>`;}
+function centerMap(){S.driver={x:40,y:50};renderMaps();renderHome();notify("Mapa centrado en tu ubicación.","info");}
+function renderMapInto(id,o){const el=$(id);if(!el)return;const px=o?o.px:68,py=o?o.py:22,dx=o?o.dx:74,dy=o?o.dy:38;
+ el.innerHTML=`<div class="street" style="left:0;top:28%;width:100%;height:14px"></div><div class="street" style="left:0;top:62%;width:100%;height:14px"></div><div class="street" style="left:30%;top:0;width:14px;height:100%"></div><div class="street" style="left:66%;top:0;width:14px;height:100%"></div><span class="street-l" style="left:8px;top:29%">Westheimer Rd</span><span class="street-l" style="left:8px;top:63%">Montrose Blvd</span><span class="street-l" style="left:31%;top:8px;writing-mode:vertical-rl">Main St</span><span class="street-l" style="left:67%;top:8px;writing-mode:vertical-rl">Kirby Dr</span>${o?`<div class="route" style="left:${S.driver.x}%;top:${S.driver.y}%;width:${Math.max(8,Math.abs(px-S.driver.x))}%;transform:rotate(${px>=S.driver.x?0:180}deg)"></div><div class="pin" style="left:${px}%;top:${py}%"><i style="background:var(--coral)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/></svg></i><span>${o.r}</span></div><div class="pin" style="left:${dx}%;top:${dy}%"><i style="background:var(--ok)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/></svg></i><span>${o.c}</span></div>`:""}<div class="driver" style="left:${S.driver.x}%;top:${S.driver.y}%"></div>`;
+ // animación suave del marcador hacia el destino
+ if(o&&S.step<4){const tx=S.step<2?px:dx,ty=S.step<2?py:dy;setTimeout(()=>{S.driver.x+=(tx-S.driver.x)*0.25;S.driver.y+=(ty-S.driver.y)*0.25;const d=document.querySelector(`#${id} .driver`);if(d){d.style.left=S.driver.x+"%";d.style.top=S.driver.y+"%";}},600);}}
+function renderEarnings(){const week=WEEK.reduce((a,b)=>a+b.v,0)+S.earned;$("weekMoney").textContent=money(week);$("weekMeta").textContent=S.deliveries+" entregas hoy · "+money(week/S.deliveries||27.59)+" por hora activa";$("dBase").textContent=money(S.base);$("dTip").textContent=money(S.tip);$("dBonus").textContent=money(S.bonus);$("dTotal").textContent=money(S.earned);
+ const max=Math.max(...WEEK.map(w=>w.v));$("chart").innerHTML=WEEK.map(w=>`<div><i style="height:${Math.round(w.v/max*80)}px"></i><b>${w.d}</b><b>$${Math.round(w.v)}</b></div>`).join("");
+ $("challenges").innerHTML=S.challenges.map(c=>{const p=c.id==="c1"?S.deliveries:c.id==="c2"?S.earned:3;return `<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line)"><div><b>${c.t}</b><div class="mut small">${c.done?"Completado":Math.min(p,c.meta)+" / "+c.meta} · +${money(c.reward)}</div></div><span class="pill ${c.done?"on":""}">${c.done?"Hecho":"En curso"}</span></div>`}).join("");
+ const lvl=[...LEVELS].reverse().find(l=>S.xp>=l.min);const next=LEVELS.find(l=>l.min>S.xp);$("levelName").textContent=lvl.n;$("levelDesc").textContent=lvl.b;$("xpText").textContent=S.xp+" XP";$("xpBar").style.width=next?Math.round((S.xp-lvl.min)/(next.min-lvl.min)*100)+"%":"100%";$("xpNext").textContent=next?("Te faltan "+(next.min-S.xp)+" XP para "+next.n):"Nivel máximo alcanzado";
+ $("paidList").innerHTML=S.history.filter(h=>h.status==="entregado").slice(0,5).map(h=>`<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--line)"><div><b>${h.r}</b><div class="mut small">${h.c} · ${h.when}</div></div><b>${money(h.total)}</b></div>`).join("")||`<p class="mut">Todavía no hay entregas pagadas hoy. Completa tu primera entrega.</p>`;}
+function renderShifts(){$("shiftList").innerHTML=S.shifts.map((s,i)=>`<div class="card row between"><div><b>${s.day}</b><div class="mut small">${s.start} – ${s.end} · ${s.zone}</div></div><button class="link" onclick="S.shifts.splice(${i},1);save();renderShifts()">Eliminar</button></div>`).join("");}
+function saveShift(){const s={day:$("shDay").value,start:$("shStart").value,end:$("shEnd").value,zone:$("shZone").value};S.shifts.push(s);save();renderShifts();notify("Turno guardado: "+s.day+" "+s.start+"–"+s.end+" en "+s.zone,"success");}
+function renderHistory(){const l=S.history.filter(h=>S.histFilter==="todas"||h.status===S.histFilter);$("historyList").innerHTML=l.length?l.map(h=>`<div class="card row between"><div><b>${h.r} → ${h.c}</b><div class="mut small">${h.id} · ${h.when} · ${h.status}</div></div><b>${money(h.total)}</b></div>`).join(""):`<div class="card"><b>Sin registros en este filtro.</b><p class="mut">Las entregas, cancelaciones y rechazos aparecerán aquí.</p></div>`;}
+function renderNotifs(){$("notifList").innerHTML=S.notifs.map(n=>`<div class="notice"><b>${n.t}</b><div class="mut small">${n.h}</div></div>`).join("");}
+function editProfile(){const f=$("profileForm");f.style.display="block";f.innerHTML=`<div class="field"><label>Nombre</label><input id="pfName" value="${S.profile.name}"></div><div class="field"><label>Vehículo</label><input id="pfVeh" value="${S.profile.vehicle}"></div><div class="row"><div class="field grow"><label>Placa</label><input id="pfPlate" value="${S.profile.plate}"></div><div class="field grow"><label>Zona</label><input id="pfZone" value="${S.profile.zone}"></div></div><div class="field"><label>Teléfono</label><input id="pfPhone" value="${S.profile.phone}"></div><button class="btn" onclick="saveProfile()">Guardar perfil</button>`;f.scrollIntoView();}
+function saveProfile(){S.profile={name:$("pfName").value,vehicle:$("pfVeh").value,plate:$("pfPlate").value,zone:$("pfZone").value,phone:$("pfPhone").value};save();$("profileForm").style.display="none";renderProfile();notify("Perfil actualizado.","success");}
+function renderProfile(){$("profileName").textContent=S.profile.name;$("avatarInit").textContent=S.profile.name.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();$("vehicleText").textContent=S.profile.vehicle+" · "+S.profile.color+" · Placa "+S.profile.plate;$("zoneText").textContent=S.profile.zone;$("phoneText").textContent=S.profile.phone;}
+setInterval(()=>{let changed=false;S.orders.forEach(o=>{if(o.status==="disponible"&&o.timer>0){o.timer--;changed=true;if(o.timer===0){o.status="rechazado";S.history.unshift({id:o.id,r:o.r,c:o.c,total:o.total,status:"rechazado",when:"Hoy"});notify("Se acabó el tiempo de "+o.r+". Pasó al siguiente repartidor.","info");}}});if(changed){const els=document.querySelectorAll("[data-timer]");els.forEach(e=>{const o=S.orders.find(x=>x.id===e.dataset.timer);if(o)e.textContent="0:"+String(Math.max(0,o.timer)).padStart(2,"0");});if(S.orders.some(o=>o.timer===0))renderOffers();}},1000);
+load();renderHome();renderOffers();renderEarnings();renderProfile();renderNotifs();renderHistory();renderShifts();
+</script>
+</body>
+</html>
